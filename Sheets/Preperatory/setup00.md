@@ -1,28 +1,25 @@
 # 00 — Setting Up Pygame
 
-## Goal
-Create a minimal simulation window that runs at a fixed frame rate and draws a circle.
-
-This is the foundation for all physics simulations in this lab.
-
 ---
+This will allow us to create a window where we can draw our objects
 
 ## 1. Install Pygame
 
-Make sure Python 3 is installed.
-
-Install pygame:
+Install pygame on the terminal by running:
 
 pip install pygame
 
 ---
 
-## 2. Minimal Simulation Template
+## 2. Basic Template
 
 ```python
 import pygame
 
 pygame.init()
+
+FPS = 60 # number of frames a second
+dt = 1/FPS # time between each frame
 
 WIDTH, HEIGHT = 600, 400
 window = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -32,19 +29,24 @@ clock = pygame.time.Clock()
 
 running = True
 while running:
-    # Limit to 60 FPS and compute delta time
-    dt = clock.tick(60) / 1000  
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
+    # clears the window
     window.fill((0, 0, 0))
 
-    # Draw a simple circle
+    # drawing a circle (we'll use this later on to draw our particles)
     pygame.draw.circle(window, (255, 0, 0), (300, 200), 20)
+    #                  window   color        position, radius
 
+    # refreshes the window
     pygame.display.flip()
+
+    # ensures proper delay between frames
+    clock.tick(FPS)
 
 pygame.quit()
 ```
+
+
