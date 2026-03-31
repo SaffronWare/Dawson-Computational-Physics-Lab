@@ -1,6 +1,6 @@
 # LOGS
 ---
-Future plans & work will be planned and logged here. This is meant only for general use, there will be seperate files for logs on individual projects.
+**Future plans & work will be planned and logged here. This is meant only for general use, there will be seperate files for logs on individual projects.**
 
 ---
 

@@ -1,3 +1,4 @@
+# No tutorial sheets are referenced for this 
 import pygame
 
 clock = pygame.time.Clock()
@@ -10,6 +11,7 @@ window = pygame.display.set_mode(window_dimensions)
 
 # constants
 gravity = 50 # pixels per s^2
+restitution = 0.99 # how much velocity is conserved on collision
 
 # initializing ball's position and velocity
 position = pygame.Vector2(0,250)
@@ -28,18 +30,18 @@ def update():
 
     # collision detection
     if position.x < radius:
-        velocity.x *= -1
+        velocity.x *= -restitution
         position.x = radius
     elif position.x > window_dimensions[0]-radius:
-        velocity.x *= -1
+        velocity.x *= -restitution
         position.x = window_dimensions[0]-radius 
     
-    # collision detection
+    # collision detectiongit
     if position.y < radius:
-        velocity.y *= -1
+        velocity.y *= -restitution
         position.y = radius
     elif position.y > window_dimensions[1]-radius:
-        velocity.y *= -1
+        velocity.y *= -restitution
         position.y = window_dimensions[1]-radius 
     
 
