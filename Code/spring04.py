@@ -71,78 +71,33 @@ class Spring:
         # Needed rest_length to compute delta_x in spring equation F = -k *delta_x
         self.rest_length = (p1.position - p2.position).length()
 
-        # If we want to create rigid bodies, we can convert the springs into rigid
-        # rods, this variable will be used to enable/disable that.
-        self.rigid = False
-
     def apply_spring(self):
         # to avoid the program exploding, before we do anything we check that the particles aren't
         # too close
         if (self.p2.position - self.p1.position).length_squared() <= 0.05:
             return
 
-        if self.rigid:
-            # rigid rod case
+        #1. Compute current length
+        length = (self.p2.position - self.p1.position).length()
+
+        #2. Compute delta_x or delta_length since we are in 2D springs.
+        delta_length = length - self.rest_length
+
+        #3. Compute spring force
+        spring_force = self.k * delta_length
             
-            #1. Compute current length
-            length = (self.p2.position - self.p1.position).length()
+        #4. Compute direction (normalized) the force will be applied in
+        force_direction = (self.p2.position - self.p1.position).normalize()
 
-            #2. Compute delta_length (amount the poits have to move to reach rest_lenth)
-            delta_length = length - self.rest_length
+        #4+ Damping
+        damping = (self.p2.velocity - self.p1.velocity).dot(force_direction) * self.damping
 
-            #3. Compute amount p1 and p2 should move.
-            ratio_p1 = self.p2.mass/(self.p1.mass + self.p2.mass)
-            ratio_p2 = 1 - ratio_p1
-
-            d1 = delta_length * ratio_p1 * self.k # for rigid springs, k will be how fast it corrects distances
-            d2 = delta_length * ratio_p2 * self.k
-
-            #4. Compute direction to move
-            move_direction = (self.p2.position - self.p1.position).normalize()
-
-            #5. Move each by the amount
-            self.p1.position += d1 * move_direction
-            self.p2.position += d2 * move_direction
-
-            #6. Update the velocities
-            # since we moved by some distance in one frame, the velocity also along the
-            # direction of movement should be d1/dt and d2/dt for p1 and p2 respectively
-
-            # first we eliminate the current component of velocity in that direction
-            self.p1.velocity = self.p1.velocity - self.p1.velocity.dot(move_direction) * move_direction * self.k
-            self.p2.velocity = self.p2.velocity - self.p2.velocity.dot(move_direction) * move_direction * self.k
-
-            # finally we set the component of velocity in that direction to d/dt
-            self.p1.velocity += d1 * move_direction / dt 
-            self.p2.velocity += d2 * move_direction / dt
-
-            
-        else:
-            # non rigid rod case
-            #1. Compute current length
-            length = (self.p2.position - self.p1.position).length()
-
-            #2. Compute delta_x or delta_length since we are in 2D springs.
-            delta_length = length - self.rest_length
-
-            #3. Compute spring force
-            spring_force = self.k * delta_length
-            
-            #4. Compute direction (normalized) the force will be applied in
-            force_direction = (self.p2.position - self.p1.position).normalize()
-
-            #4+ Damping
-            damping = (self.p2.velocity - self.p1.velocity).dot(force_direction) * self.damping
-
-            #5. Update particle velocities
-            self.p1.velocity += (spring_force+damping) * force_direction / self.p1.mass * dt
-            self.p2.velocity -= (spring_force+damping) * force_direction / self.p2.mass * dt
+        #5. Update particle velocities
+        self.p1.velocity += (spring_force+damping) * force_direction / self.p1.mass * dt
+        self.p2.velocity -= (spring_force+damping) * force_direction / self.p2.mass * dt
         
     def draw(self):
-        if self.rigid:
-            pygame.draw.line(window, (255,255,255), self.p1.position, self.p2.position, 4)
-        else:
-            pygame.draw.line(window, (160,160,160), self.p1.position, self.p2.position, 2)
+        pygame.draw.line(window, (160,160,160), self.p1.position, self.p2.position, 2)
 
 
 """-----------------CREATING VARIABLES ------------------------------------------------"""     
@@ -160,8 +115,7 @@ springs = [Spring(100,particles[0], particles[1]),
            Spring(100,particles[1],particles[3]),
            Spring(100,particles[2],particles[3])]
 
-springs[1].rigid = False
-springs[2].rigid = False
+
 
 
 
@@ -219,11 +173,6 @@ def update():
 
     for spring in springs:
         spring.apply_spring()
-    
-    for _ in range(5):
-        for spring in springs:
-            if spring.rigid:
-                spring.apply_spring()
 
     # check for collisions
     for i in range(len(particles)):
@@ -240,10 +189,6 @@ def draw():
     for particle in particles:
         particle.draw()
 
-    
-    
-
-    
     
 running = True
 while running:
