@@ -233,7 +233,25 @@ We're done! We have solved for alpha. Here are our final equations.
 In the next section we will simply implement this.
 
 ## Collision Response
-Lets create our function which updates the velocities of our particles after collision.
+Lets create our function which updates the velocities of our particles after collision. Before we do so, notice that our calculations all rely on mass, so I have added a mass parameter to our Particle class (view collisions03.py for full collision code).
 
 ```py
+def respondCollision(particle1, particle2):
+    # compute normal
+    normal = particle2.position - particle1.position
+    normal /= normal.length() # sets length to 1
+
+    # compute alpha
+    m1 = particle1.mass
+    m2 = particle2.mass
+    v1 = particle1.velocity
+    v2 = particle2.velocity
+    alpha = 2 * m2 / (m1 + m2) * (v2 - v1).dot(normal)
+
+    # compute beta
+    beta = -m1 * alpha / m2
+
+    # update v1 and v2
+    particle1.velocity = v1 + alpha * normal
+    particle2.velocity = v2 + beta * normal
 ```
